@@ -8,6 +8,9 @@ name VARCHAR(30),
 PRIMARY KEY (id)
 );
 
+INSERT INTO department(name)
+VALUES ("sales"), ("Engineering"), ("Finance"), ("Legal");
+
 CREATE TABLE role (
 id INT AUTO_INCREMENT,
 title VARCHAR(30),
@@ -15,6 +18,10 @@ salary DECIMAL(10, 4),
 department_id INT,
 PRIMARY KEY (id)
 );
+
+INSERT INTO role(title, salary, department_id)
+VALUES ("Lead Engineer", 150000, 2), ("Software Engineer", 120000, 2), ("Sales Lead", 100000, 1), ("Salesperson", 80000, 1), ("Legal Team Lead", 250000, 4), ("Lawyer", 190000, 4), ("Accountant", 125000, 3);
+
 
 CREATE TABLE employee (
 id INT AUTO_INCREMENT,
