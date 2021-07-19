@@ -2,11 +2,6 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTables = require("console.table");
 
-const roleCheck = `SELECT first_name, last_name, title, salary, department.role, manager_id
-FROM employee
-JOIN role ON employee.role_id = role.role_id 
-JOIN department ON role.department_id = department.department_id`;
-
 const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -15,6 +10,12 @@ const connection = mysql.createConnection({
   database: "employeesDB",
 });
 
+const roleCheck = `SELECT id, employee.first_name, employee.Last_name, title, salary, department.role, managers.manager
+FROM employee
+JOIN role ON employee.role_id = role.role_id 
+JOIN department ON role.department_id = department.department_id
+LEFT JOIN managers on employee.manager_id = managers.manager_id`;
+
 const checkConnection = () => {
   connection.query(roleCheck, (err, res) => {
     if (err) throw err;
@@ -22,8 +23,6 @@ const checkConnection = () => {
     connection.end();
   });
 };
-
-// checkConnection();
 
 const init = () => {
   inquirer
@@ -86,8 +85,11 @@ const init = () => {
 };
 
 const allEmployees = () => {
-    connection.query()
+    connection.query(roleCheck, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init();
+      })
 }
 
-checkConnection();
-init();
+init()
