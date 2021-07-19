@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   database: "employeesDB",
 });
 
-const roleCheck = `SELECT id, employee.first_name, employee.Last_name, title, salary, department.role, managers.manager
+const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
 FROM employee
 JOIN role ON employee.role_id = role.role_id 
 JOIN department ON role.department_id = department.department_id
@@ -90,6 +90,44 @@ const allEmployees = () => {
         console.table(res);
         init();
       })
+}
+
+const allEmployeeDepartments = () => {
+    inquirer
+        .prompt({
+            type: 'rawlist',
+            name: 'departments',
+            message: 'Choose a department.',
+            choices: ['Engineering', 'Finance', 'Legal']
+        }).then((answer) => {
+            if (answer.departments === 'Engineering'){
+                connection.query(`SELECT employee.first_name, employee.Last_name FROM employee
+                JOIN role ON employee.role_id = role.role_id 
+                JOIN department ON role.department_id = department.department_id and department.role = "Engineering"`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    init();
+                  })
+                }
+            else if (answer.departments === 'Finance'){
+                connection.query(`SELECT employee.first_name, employee.Last_name FROM employee
+                JOIN role ON employee.role_id = role.role_id 
+                JOIN department ON role.department_id = department.department_id and department.role = "Finance"`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    init();
+                  }) 
+                }
+            else if (answer.departments === 'Legal'){
+                connection.query(`SELECT employee.first_name, employee.Last_name FROM employee
+                JOIN role ON employee.role_id = role.role_id 
+                JOIN department ON role.department_id = department.department_id and department.role = "Legal"`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    init();
+                  })
+            }
+        });
 }
 
 init()
