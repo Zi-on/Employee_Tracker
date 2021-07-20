@@ -11,15 +11,13 @@ const connection = mysql.createConnection({
   database: "employeesDB",
 });
 const getManager = () => {
-    connection.query(`SELECT managers.manager
-    FROM employee
-    JOIN role ON employee.role_id = role.role_id 
-    JOIN department ON role.department_id = department.department_id
-    JOIN managers on employee.manager_id = managers.manager_id;`, (err, res) => {
+    connection.query(`SELECT manager FROM managers`, (err, res) => {
         if (err) throw err;
-        managers.push(res);
+        for (let i = 0; i < res.length; i++) {
+        managers.push(res[i].manager)
+    };
         console.log(managers);
-        connection.end();
+        return managers;
       });
 }
 // getManager();
@@ -155,6 +153,22 @@ const allEmployeeDepartments = () => {
                   })
             }
         });
+};
+
+addEmployee = () => {
+    getManager();
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                name: 'manager',
+                message: 'Who is your manager?',
+                choices: managers,
+            },
+        ]).then((answer) => {
+            console.log("OKAY")
+        })
 }
 
 init()
+// getManager();
