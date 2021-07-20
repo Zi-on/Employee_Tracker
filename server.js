@@ -105,6 +105,14 @@ const init = () => {
       }
     });
 };
+const allManagers = () => {
+    connection.query(`SELECT manager FROM managers`, (err, res) => {
+        if (err) throw err;
+        console.log("\nALL MANAGERS\n");
+        console.table(res);
+        init();
+    })
+};
 
 const allEmployees = () => {
     connection.query(roleCheck, (err, res) => {
@@ -166,6 +174,7 @@ const allEmployeeDepartments = () => {
 };
 
 addEmployee = () => {
+    managers.push('none');
     inquirer
         .prompt([
             {
@@ -174,12 +183,12 @@ addEmployee = () => {
                 message: 'What is your first name?'
             },
             {
-                input: 'input',
+                type: 'input',
                 name: 'last_name',
                 message: 'What is your last name?'
             },
             {
-                input: 'list',
+                type: 'list',
                 name: 'role',
                 message: 'What is your position?',
                 choices: roles
@@ -191,6 +200,7 @@ addEmployee = () => {
                 choices: managers
             },
         ]).then((answer) => {
+            console.log(managers);
             
         })
 }
