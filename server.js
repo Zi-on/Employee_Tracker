@@ -2,6 +2,7 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTables = require("console.table");
 const managers = [];
+const roles = [];
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -15,12 +16,19 @@ const getManager = () => {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
         managers.push(res[i].manager)
-    };
-        console.log(managers);
-        return managers;
+    }
       });
-}
-// getManager();
+};
+
+const getRole = () => {
+    connection.query(`SELECT title FROM role`, (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            roles.push(res[i].title)
+        }
+    });
+};
+
 
 const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
 FROM employee
@@ -37,6 +45,8 @@ const checkConnection = () => {
 };
 
 const init = () => {
+    getRole();
+    getManager();
   inquirer
     .prompt({
       name: "init",
@@ -156,17 +166,32 @@ const allEmployeeDepartments = () => {
 };
 
 addEmployee = () => {
-    getManager();
     inquirer
         .prompt([
+            {
+                type: 'input',
+                name: 'first_name',
+                message: 'What is your first name?'
+            },
+            {
+                input: 'input',
+                name: 'last_name',
+                message: 'What is your last name?'
+            },
+            {
+                input: 'list',
+                name: 'role',
+                message: 'What is your position?',
+                choices: roles
+            },
             {
                 type: 'list',
                 name: 'manager',
                 message: 'Who is your manager?',
-                choices: managers,
+                choices: managers
             },
         ]).then((answer) => {
-            console.log("OKAY")
+            
         })
 }
 
