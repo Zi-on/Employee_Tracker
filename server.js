@@ -1,6 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTables = require("console.table");
+const managers = [];
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -9,6 +10,19 @@ const connection = mysql.createConnection({
   password: "password",
   database: "employeesDB",
 });
+const getManager = () => {
+    connection.query(`SELECT managers.manager
+    FROM employee
+    JOIN role ON employee.role_id = role.role_id 
+    JOIN department ON role.department_id = department.department_id
+    JOIN managers on employee.manager_id = managers.manager_id;`, (err, res) => {
+        if (err) throw err;
+        managers.push(res);
+        console.log(managers);
+        connection.end();
+      });
+}
+// getManager();
 
 const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
 FROM employee
@@ -86,11 +100,21 @@ const init = () => {
 
 const allEmployees = () => {
     connection.query(roleCheck, (err, res) => {
+        console.log("\nALL EMPLOYEES\n");
         if (err) throw err;
         console.table(res);
         init();
       })
-}
+};
+
+const allRoles = () => {
+    connection.query(`SELECT title FROM role`, (err, res) => {
+        console.log("\nALL ROLES\n");
+        if (err) throw err;
+        console.table(res);
+        init();
+      })
+};
 
 const allEmployeeDepartments = () => {
     inquirer
@@ -104,6 +128,7 @@ const allEmployeeDepartments = () => {
                 connection.query(`SELECT employee.first_name, employee.Last_name FROM employee
                 JOIN role ON employee.role_id = role.role_id 
                 JOIN department ON role.department_id = department.department_id and department.role = "Engineering"`, (err, res) => {
+                    console.log("\nEngineers\n");
                     if (err) throw err;
                     console.table(res);
                     init();
@@ -113,6 +138,7 @@ const allEmployeeDepartments = () => {
                 connection.query(`SELECT employee.first_name, employee.Last_name FROM employee
                 JOIN role ON employee.role_id = role.role_id 
                 JOIN department ON role.department_id = department.department_id and department.role = "Finance"`, (err, res) => {
+                    console.log("\nFinance\n");
                     if (err) throw err;
                     console.table(res);
                     init();
@@ -122,6 +148,7 @@ const allEmployeeDepartments = () => {
                 connection.query(`SELECT employee.first_name, employee.Last_name FROM employee
                 JOIN role ON employee.role_id = role.role_id 
                 JOIN department ON role.department_id = department.department_id and department.role = "Legal"`, (err, res) => {
+                    console.log("\nLegal\n");
                     if (err) throw err;
                     console.table(res);
                     init();
