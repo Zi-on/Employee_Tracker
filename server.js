@@ -17,18 +17,19 @@ const getManager = () => {
         for (let i = 0; i < res.length; i++) {
         managers.push(res[i].manager)
     }
+    // console.log(managers)
       });
 };
-
+// getManager();
 const getRole = () => {
     connection.query(`SELECT title FROM role`, (err, res) => {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
             roles.push(res[i].title)
         }
-    });
+    })
 };
-
+// getRole();
 
 const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
 FROM employee
@@ -101,6 +102,10 @@ const init = () => {
 
         case "View All Managers":
           allManagers();
+          break;
+
+        case "Exit":
+          connection.end();
           break;
       }
     });
@@ -200,10 +205,27 @@ addEmployee = () => {
                 choices: managers
             },
         ]).then((answer) => {
-            console.log(managers);
-            
+            const roleId = roles.indexOf(answer.role) + 1;
+            const managerId = managers.indexOf(answer.manager) + 1;
+            if (answer.manager === 'none') {
+                connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
+                Values ('${answer.first_name}', '${answer.last_name}', null, ${roleId})`, (err, res) => {
+                    if (err) throw err;
+                    init();
+                });
+            }
+            else {
+                connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
+                Values ('${answer.first_name}', '${answer.last_name}', ${managerId}, ${roleId})`, (err, res) => {
+                    if (err) throw err;
+                    init();
+            })
+            }
+           
         })
 }
 
 init()
 // getManager();
+// INSERT INTO employee(first_name, last_name, role_id, manager_id)
+// VALUES ("Zion", "Flores", 1, null)
