@@ -1,8 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTables = require("console.table");
-const managers = [];
-const roles = [];
+var managers = [];
+var roles = [];
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -43,6 +43,8 @@ LEFT JOIN managers on employee.manager_id = managers.manager_id`;
 
 
 const init = () => {
+    // roles = [];
+    // managers = [];
     getRole();
     getManager();
   inquirer
