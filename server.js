@@ -3,6 +3,7 @@ const inquirer = require("inquirer");
 const consoleTables = require("console.table");
 var managers = [];
 var roles = [];
+var employees = [];
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -18,6 +19,7 @@ const getManager = () => {
         for (let i = 0; i < res.length; i++) {
         managers.push(res[i].manager)
     }
+    // console.log(managers)
     return managers;
     // console.log(managers)
       });
@@ -30,9 +32,26 @@ const getRole = () => {
         for (let i = 0; i < res.length; i++) {
             roles.push(res[i].title)
         }
+        // console.log(roles)
         return roles;
     })
 };
+
+const getEmployee = () => {
+  connection.query(`SELECT first_name, last_name FROM employee`, (err, res) => {
+    if (err) throw err;
+    employees = [];
+    for (let i = 0; i < res.length; i++) {
+      firstName = res[i].first_name;
+      lastName = res[i].last_name;
+        var newEmployees = firstName.concat(" ", lastName);
+        employees.push(newEmployees);
+    }
+    console.log(employees)
+    return employees;
+})
+}
+getEmployee();
 // getRole();
 
 const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
@@ -208,14 +227,14 @@ addEmployee = () => {
             const managerId = managers.indexOf(answer.manager) + 1;
             if (answer.manager === 'none') {
                 connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-                Values ('${answer.first_name}', '${answer.last_name}', null, ${roleId})`, (err, res) => {
+                Values ('${answer.first_name}', '${answer.last_name}', ${roleId}, null)`, (err, res) => {
                     if (err) throw err;
                     init();
                 });
             }
             else {
                 connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-                Values ('${answer.first_name}', '${answer.last_name}', ${managerId}, ${roleId})`, (err, res) => {
+                Values ('${answer.first_name}', '${answer.last_name}', ${roleId}, ${managerId})`, (err, res) => {
                     if (err) throw err;
                     init();
             })
@@ -224,4 +243,4 @@ addEmployee = () => {
         })
 }
 
-init()
+// init()
