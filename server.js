@@ -14,9 +14,11 @@ const connection = mysql.createConnection({
 const getManager = () => {
     connection.query(`SELECT manager FROM managers`, (err, res) => {
         if (err) throw err;
+        managers = [];
         for (let i = 0; i < res.length; i++) {
         managers.push(res[i].manager)
     }
+    return managers;
     // console.log(managers)
       });
 };
@@ -24,9 +26,11 @@ const getManager = () => {
 const getRole = () => {
     connection.query(`SELECT title FROM role`, (err, res) => {
         if (err) throw err;
+        roles = [];
         for (let i = 0; i < res.length; i++) {
             roles.push(res[i].title)
         }
+        return roles;
     })
 };
 // getRole();
@@ -37,13 +41,6 @@ JOIN role ON employee.role_id = role.role_id
 JOIN department ON role.department_id = department.department_id
 LEFT JOIN managers on employee.manager_id = managers.manager_id`;
 
-const checkConnection = () => {
-  connection.query(roleCheck, (err, res) => {
-    if (err) throw err;
-    console.table(res);
-    connection.end();
-  });
-};
 
 const init = () => {
     getRole();
@@ -226,6 +223,3 @@ addEmployee = () => {
 }
 
 init()
-// getManager();
-// INSERT INTO employee(first_name, last_name, role_id, manager_id)
-// VALUES ("Zion", "Flores", 1, null)
