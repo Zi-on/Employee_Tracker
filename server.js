@@ -37,21 +37,33 @@ const getRole = () => {
     })
 };
 
+
+
+
 const getEmployee = () => {
-  connection.query(`SELECT first_name, last_name FROM employee`, (err, res) => {
+  connection.query(`SELECT first_name, last_name, id FROM employee`, (err, res) => {
     if (err) throw err;
     employees = [];
     for (let i = 0; i < res.length; i++) {
-      firstName = res[i].first_name;
-      lastName = res[i].last_name;
-        var newEmployees = firstName.concat(" ", lastName);
-        employees.push(newEmployees);
+      const id = res[i].id;
+      const firstName = res[i].first_name;
+      const lastName = res[i].last_name;
+        // var newEmployees = firstName.concat(" ", lastName);
+        var newEmployees = {
+          name: firstName.concat(" ", lastName),
+          value: id
+        }
+         employees.push(newEmployees);
+        // console.log(newEmployees)
+
     }
-    console.log(employees)
+
+    // console.log(employees)
     return employees;
 })
 }
-getEmployee();
+
+// getEmployee();
 // getRole();
 
 const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
@@ -62,8 +74,7 @@ LEFT JOIN managers on employee.manager_id = managers.manager_id`;
 
 
 const init = () => {
-    // roles = [];
-    // managers = [];
+    getEmployee();
     getRole();
     getManager();
   inquirer
@@ -106,13 +117,13 @@ const init = () => {
           removeEmployee();
           break;
 
-        case "Update Employee Role":
-          updateRole();
-          break;
+        // case "Update Employee Role":
+        //   updateRole();
+        //   break;
 
-        case "Update Employee Manager":
-          updateManager();
-          break;
+        // case "Update Employee Manager":
+        //   updateManager();
+        //   break;
 
         case "View All Roles":
           allRoles();
@@ -243,4 +254,19 @@ addEmployee = () => {
         })
 }
 
-// init()
+const removeEmployee = () => {
+  inquirer
+    .prompt({
+        type: 'list',
+        name: 'employee',
+        message: 'Who would you like to remove?',
+        choices: employees
+    }).then((answer) => {
+      connection.query(`DELETE FROM employee WHERE id=${answer.employee}`, (err, res) => {
+        if (err) throw err;
+        init();
+      })
+      console.log(answer)
+    })
+}
+init()
