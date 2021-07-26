@@ -3,6 +3,7 @@ const inquirer = require("inquirer");
 const consoleTables = require("console.table");
 var managers = [];
 var roles = [];
+var departments = [];
 var employees = [];
 
 const connection = mysql.createConnection({
@@ -12,6 +13,7 @@ const connection = mysql.createConnection({
   password: "password",
   database: "employeesDB",
 });
+
 const getManager = () => {
   connection.query(`SELECT manager, manager_id FROM managers`, (err, res) => {
     if (err) throw err;
@@ -24,13 +26,29 @@ const getManager = () => {
         value: manager_id,
       };
       managers.push(newManager);
-    }
-    // console.log(managers)
+    };
     return managers;
-    // console.log(managers)
   });
 };
-// getManager();
+
+const getDepartments = () => {
+  connection.query(`SELECT role, department_id FROM department`, (err, res) => {
+    if (err) throw err;
+    departments = [];
+    for (let i = 0; i < res.length; i++) {
+      const id = res[i].department_id;
+      const title = res[i].role;
+      var newDepartment = {
+        name: title,
+        value: id,
+      };
+      departments.push(newDepartment);
+    };
+    return departments;
+  });
+};
+
+
 const getRole = () => {
   connection.query(`SELECT title, role_id FROM role`, (err, res) => {
     if (err) throw err;
@@ -43,12 +61,11 @@ const getRole = () => {
         value: id,
       };
       roles.push(newRole);
-    }
-    // console.log(roles)
+    };
     return roles;
   });
 };
-// getRole();
+
 
 const getEmployee = () => {
   connection.query(
@@ -60,23 +77,17 @@ const getEmployee = () => {
         const id = res[i].id;
         const firstName = res[i].first_name;
         const lastName = res[i].last_name;
-        // var newEmployees = firstName.concat(" ", lastName);
         var newEmployees = {
           name: firstName.concat(" ", lastName),
           value: id,
         };
         employees.push(newEmployees);
-        // console.log(newEmployees)
       }
-
-      // console.log(employees)
       return employees;
     }
   );
 };
 
-// getEmployee();
-// getRole();
 
 const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
 FROM employee
@@ -87,6 +98,7 @@ LEFT JOIN managers on employee.manager_id = managers.manager_id`;
 const init = () => {
   getEmployee();
   getRole();
+  getDepartments();
   getManager();
   inquirer
     .prompt({
@@ -98,10 +110,13 @@ const init = () => {
         "View All Employees By Department",
         "View All Employees By Manager",
         "Add Employee",
+        "Add Department",
+        "Add Role",
         "Remove Employee",
         "Update Employee Role",
         "Update Employee Manager",
         "View All Roles",
+        "View All Departments",
         "View All Managers",
       ],
     })
@@ -121,6 +136,14 @@ const init = () => {
 
         case "Add Employee":
           addEmployee();
+          break;
+
+        case "Add Department":
+          addDepartment();
+          break;
+
+        case "Add Role":
+          addRole();
           break;
 
         case "Remove Employee":
@@ -143,11 +166,69 @@ const init = () => {
           allManagers();
           break;
 
+        case "View All Departments":
+          allDepartments();
+          break;
+
         case "Exit":
           connection.end();
           break;
       }
     });
+};
+
+const allDepartments = () => {
+  connection.query(`SELECT role FROM department`, (err, res) => {
+    console.log("\nALL DEPARTMENTS\n");
+    if (err) throw err;
+    console.table(res);
+    init();
+  });
+};
+
+const addDepartment = () => {
+  inquirer
+    .prompt({
+      type: "input",
+      name: "department",
+      message: "What department would you like to add?"
+    })
+    .then((answer) => {
+      connection.query(`INSERT INTO department(role)
+      VALUES("${answer.department}")`, (err, res) => {
+        if (err) throw err;
+        init();
+      })
+    })
+};
+
+const addRole = () => {
+  inquirer
+    .prompt([
+      {
+      type: "input",
+      name: "role",
+      message: "What role would you like to add?"
+    },
+    {
+      type: "input",
+      name: "salary",
+      value: "What is their salary?"
+    },
+    {
+      type: "list",
+      name: "department",
+      value: "What department does this role belong to?",
+      choices: departments
+    }
+    ])
+    .then((answer) => {
+      connection.query(`INSERT INTO role(title, salary, department_id)
+      VALUES("${answer.role}", ${answer.salary}, ${answer.department})`, (err, res) => {
+        if (err) throw err;
+        init();
+      })
+    })
 };
 
 const allEmployeeManagers = () => {
@@ -262,7 +343,7 @@ const allEmployeeDepartments = () => {
       type: "rawlist",
       name: "departments",
       message: "Choose a department.",
-      choices: ["Engineering", "Finance", "Legal"],
+      choices: departments,
     })
     .then((answer) => {
       if (answer.departments === "Engineering") {
@@ -374,4 +455,5 @@ const removeEmployee = () => {
       console.log(answer);
     });
 };
+
 init();
