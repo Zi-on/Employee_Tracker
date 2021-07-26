@@ -313,14 +313,14 @@ addEmployee = () => {
         ]).then((answer) => {
             if (answer.manager === 'none') {
                 connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-                Values ('${answer.first_name}', '${answer.last_name}', ${answer.roles}, null)`, (err, res) => {
+                Values ('${answer.first_name}', '${answer.last_name}', ${answer.role}, null)`, (err, res) => {
                     if (err) throw err;
                     init();
                 });
             }
             else {
                 connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-                Values ('${answer.first_name}', '${answer.last_name}', ${answer.roles}, ${answer.managers})`, (err, res) => {
+                Values ('${answer.first_name}', '${answer.last_name}', ${answer.role}, ${answer.manager})`, (err, res) => {
                     if (err) throw err;
                     init();
             })
