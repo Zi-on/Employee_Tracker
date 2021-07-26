@@ -457,7 +457,7 @@ const removeEmployee = () => {
       console.log(answer);
     });
 };
-
+// displays the total budget based on all the employees salary
 const viewBudget = () => {
   connection.query(`SELECT salary 
   FROM employee
