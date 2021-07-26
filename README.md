@@ -40,6 +40,7 @@ Email: Zioniflores12@yahoo.com
 ## Screen Shots
 
 <img src="pictures/screenshot.png">
+<img src="pictures/screenshot2.png">
 
 ## video 
 
