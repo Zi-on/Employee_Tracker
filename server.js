@@ -111,6 +111,7 @@ const init = () => {
         "View All Roles",
         "View All Departments",
         "View All Managers",
+        "View Budget"
       ],
     })
     .then((answer) => {
@@ -161,6 +162,10 @@ const init = () => {
 
         case "View All Departments":
           allDepartments();
+          break;
+
+        case "View Budget":
+          viewBudget();
           break;
 
         case "Exit":
@@ -452,5 +457,28 @@ const removeEmployee = () => {
       console.log(answer);
     });
 };
+
+const viewBudget = () => {
+  connection.query(`SELECT salary 
+  FROM employee
+  JOIN role ON employee.role_id = role.role_id 
+  JOIN department ON role.department_id = department.department_id
+  LEFT JOIN managers on employee.manager_id = managers.manager_id`, (err, res) => {
+    if (err) throw err;
+    console.log(res);
+    var budget = [];
+    for (let i = 0; i < res.length; i++) {
+      const addBudget = res[i].salary;
+      budget.push(addBudget)
+    }
+    var sum = budget.reduce(function(a, b){
+      return a + b;
+    }, 0);
+    console.log("TOTAL BUDGET")
+    console.log(sum)
+    init();
+  })
+}
+
 // initializes application
 init();
