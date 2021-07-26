@@ -3,3 +3,6 @@ VALUES ("Zion", "Flores", 1, null), ("Kenny", "Smith", 2, 1), ("Tommy", "Hill", 
 
 INSERT INTO managers(manager)
 VALUES("Zion Flores"), ("Tommy Hill"), ("Manny Pac");
+
+SELECT * FROM employee;
+SELECT * FROM managers;
