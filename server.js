@@ -149,6 +149,23 @@ const init = () => {
     });
 };
 
+const allEmployeeManagers = () => {
+  inquirer
+    .prompt({
+        type: 'list',
+        name: 'manager',
+        message: 'choose a manager?',
+        choices: managers
+    }).then((answer) => {
+      connection.query(`SELECT first_name, last_name FROM employee
+      WHERE manager_id = ${answer.manager};`, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        init()
+      })
+    })
+};
+
 const updateManager = () => {
   inquirer
     .prompt([{
@@ -171,7 +188,7 @@ const updateManager = () => {
       init()
     })
   })
-}
+};
 
 const updateRole = () => {
   inquirer
