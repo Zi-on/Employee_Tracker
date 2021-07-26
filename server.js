@@ -13,11 +13,17 @@ const connection = mysql.createConnection({
   database: "employeesDB",
 });
 const getManager = () => {
-    connection.query(`SELECT manager FROM managers`, (err, res) => {
+    connection.query(`SELECT manager, manager_id FROM managers`, (err, res) => {
         if (err) throw err;
         managers = [];
         for (let i = 0; i < res.length; i++) {
-        managers.push(res[i].manager)
+        const manager = res[i].manager;
+        const manager_id = res[i].manager_id;
+        var newManager = {
+          name: manager,
+          value: manager_id
+        }
+        managers.push(newManager);
     }
     // console.log(managers)
     return managers;
@@ -143,13 +149,37 @@ const init = () => {
     });
 };
 
+const updateManager = () => {
+  inquirer
+    .prompt([{
+      type: 'list',
+      name: 'employee',
+      message: 'What employee is getting anew manager?',
+      choices: employees
+    },
+    {
+      type: 'list',
+      name: 'manager',
+      message: 'Who is your new manager?',
+      choices: managers
+  },
+  ]).then((answer) => {
+    connection.query(`UPDATE employee
+    SET manager_id = ${answer.manager}
+    WHERE id = ${answer.employee}`, (err, res) => {
+      if (err) throw err;
+      init()
+    })
+  })
+}
+
 const updateRole = () => {
   inquirer
     .prompt([
       {
       type: 'list',
       name: 'employee',
-      message: 'Who role are we updating?',
+      message: 'Whose role are we updating?',
       choices: employees
       },
       {
@@ -264,18 +294,16 @@ addEmployee = () => {
                 choices: managers
             },
         ]).then((answer) => {
-            const roleId = roles.indexOf(answer.role) + 1;
-            const managerId = managers.indexOf(answer.manager) + 1;
             if (answer.manager === 'none') {
                 connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-                Values ('${answer.first_name}', '${answer.last_name}', ${roleId}, null)`, (err, res) => {
+                Values ('${answer.first_name}', '${answer.last_name}', ${answer.roles}, null)`, (err, res) => {
                     if (err) throw err;
                     init();
                 });
             }
             else {
                 connection.query(`INSERT INTO employee(first_name, last_name, role_id, manager_id)
-                Values ('${answer.first_name}', '${answer.last_name}', ${roleId}, ${managerId})`, (err, res) => {
+                Values ('${answer.first_name}', '${answer.last_name}', ${answer.roles}, ${answer.managers})`, (err, res) => {
                     if (err) throw err;
                     init();
             })
