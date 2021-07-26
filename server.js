@@ -1,11 +1,13 @@
+//Dependencies
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const consoleTables = require("console.table");
+// created blank arrays for my tables
 var managers = [];
 var roles = [];
 var departments = [];
 var employees = [];
-
+// connection to mysql database
 const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -13,7 +15,7 @@ const connection = mysql.createConnection({
   password: "password",
   database: "employeesDB",
 });
-
+// function to grab managers from database and insert them into managers array
 const getManager = () => {
   connection.query(`SELECT manager, manager_id FROM managers`, (err, res) => {
     if (err) throw err;
@@ -30,7 +32,7 @@ const getManager = () => {
     return managers;
   });
 };
-
+// function to grab departments from database and insert them in departments array
 const getDepartments = () => {
   connection.query(`SELECT role, department_id FROM department`, (err, res) => {
     if (err) throw err;
@@ -47,8 +49,7 @@ const getDepartments = () => {
     return departments;
   });
 };
-
-
+// function to grab roles from database and insert them roles array
 const getRole = () => {
   connection.query(`SELECT title, role_id FROM role`, (err, res) => {
     if (err) throw err;
@@ -65,8 +66,7 @@ const getRole = () => {
     return roles;
   });
 };
-
-
+// function to grab employees from database and insert them employees array
 const getEmployee = () => {
   connection.query(
     `SELECT first_name, last_name, id FROM employee`,
@@ -87,14 +87,7 @@ const getEmployee = () => {
     }
   );
 };
-
-
-const roleCheck = `SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
-FROM employee
-JOIN role ON employee.role_id = role.role_id 
-JOIN department ON role.department_id = department.department_id
-LEFT JOIN managers on employee.manager_id = managers.manager_id`;
-
+// function that initializes the app and asks what they would like to do and directs them to associated function
 const init = () => {
   getEmployee();
   getRole();
@@ -176,7 +169,7 @@ const init = () => {
       }
     });
 };
-
+// function that previews all departments
 const allDepartments = () => {
   connection.query(`SELECT role FROM department`, (err, res) => {
     console.log("\nALL DEPARTMENTS\n");
@@ -185,7 +178,7 @@ const allDepartments = () => {
     init();
   });
 };
-
+// function to add a new department to the database
 const addDepartment = () => {
   inquirer
     .prompt({
@@ -201,7 +194,7 @@ const addDepartment = () => {
       })
     })
 };
-
+// function to add a new role to the database
 const addRole = () => {
   inquirer
     .prompt([
@@ -230,7 +223,7 @@ const addRole = () => {
       })
     })
 };
-
+// function that displays all the employees that are associated with a manager
 const allEmployeeManagers = () => {
   inquirer
     .prompt({
@@ -251,7 +244,7 @@ const allEmployeeManagers = () => {
       );
     });
 };
-
+// function to update an employees manager
 const updateManager = () => {
   inquirer
     .prompt([
@@ -280,7 +273,7 @@ const updateManager = () => {
       );
     });
 };
-
+// function to update role of an employee
 const updateRole = () => {
   inquirer
     .prompt([
@@ -309,7 +302,7 @@ const updateRole = () => {
       );
     });
 };
-
+// function that displays all managers
 const allManagers = () => {
   connection.query(`SELECT manager FROM managers`, (err, res) => {
     if (err) throw err;
@@ -318,16 +311,20 @@ const allManagers = () => {
     init();
   });
 };
-
+// function that displays all employees and their associated data like role, salary, department and manager
 const allEmployees = () => {
-  connection.query(roleCheck, (err, res) => {
+  connection.query(`SELECT id, employee.first_name, employee.last_name, title, salary, department.role, managers.manager
+  FROM employee
+  JOIN role ON employee.role_id = role.role_id 
+  JOIN department ON role.department_id = department.department_id
+  LEFT JOIN managers on employee.manager_id = managers.manager_id`, (err, res) => {
     console.log("\nALL EMPLOYEES\n");
     if (err) throw err;
     console.table(res);
     init();
   });
 };
-
+// function to display all roles
 const allRoles = () => {
   connection.query(`SELECT title FROM role`, (err, res) => {
     console.log("\nALL ROLES\n");
@@ -336,7 +333,7 @@ const allRoles = () => {
     init();
   });
 };
-
+// function to display all employees associated with a department
 const allEmployeeDepartments = () => {
   inquirer
     .prompt({
@@ -385,7 +382,7 @@ const allEmployeeDepartments = () => {
       }
     });
 };
-
+// function to add a new employee to the database
 addEmployee = () => {
   managers.push("none");
   inquirer
@@ -435,7 +432,7 @@ addEmployee = () => {
       }
     });
 };
-
+// function to remove existing employee from database
 const removeEmployee = () => {
   inquirer
     .prompt({
@@ -455,5 +452,5 @@ const removeEmployee = () => {
       console.log(answer);
     });
 };
-
+// initializes application
 init();
