@@ -26,19 +26,23 @@ const getManager = () => {
 };
 // getManager();
 const getRole = () => {
-    connection.query(`SELECT title FROM role`, (err, res) => {
+    connection.query(`SELECT title, role_id FROM role`, (err, res) => {
         if (err) throw err;
         roles = [];
         for (let i = 0; i < res.length; i++) {
-            roles.push(res[i].title)
+            const id = res[i].role_id;
+            const title = res[i].title;
+            var newRole = {
+              name: title,
+              value: id
+            }
+            roles.push(newRole)
         }
         // console.log(roles)
         return roles;
     })
 };
-
-
-
+// getRole();
 
 const getEmployee = () => {
   connection.query(`SELECT first_name, last_name, id FROM employee`, (err, res) => {
@@ -89,7 +93,6 @@ const init = () => {
         "Add Employee",
         "Remove Employee",
         "Update Employee Role",
-        "Update Manager Role",
         "Update Employee Manager",
         "View All Roles",
         "View All Managers",
@@ -117,13 +120,13 @@ const init = () => {
           removeEmployee();
           break;
 
-        // case "Update Employee Role":
-        //   updateRole();
-        //   break;
+        case "Update Employee Role":
+          updateRole();
+          break;
 
-        // case "Update Employee Manager":
-        //   updateManager();
-        //   break;
+        case "Update Employee Manager":
+          updateManager();
+          break;
 
         case "View All Roles":
           allRoles();
@@ -139,6 +142,33 @@ const init = () => {
       }
     });
 };
+
+const updateRole = () => {
+  inquirer
+    .prompt([
+      {
+      type: 'list',
+      name: 'employee',
+      message: 'Who role are we updating?',
+      choices: employees
+      },
+      {
+        type: 'list',
+        name: 'role',
+        message: 'What is their new role?',
+        choices: roles
+      },
+  ]).then((answer) => {
+  connection.query(`UPDATE employee
+  SET role_id = ${answer.role}
+  WHERE id = ${answer.employee};`, (err, res) => {
+    if (err) throw err;
+    init();
+  })
+  
+  })
+};
+
 const allManagers = () => {
     connection.query(`SELECT manager FROM managers`, (err, res) => {
         if (err) throw err;
